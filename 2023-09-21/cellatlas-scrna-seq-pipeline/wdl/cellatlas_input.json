@@ -1,8 +1,0 @@
-{
-  "CellAtlasBuild.wf_spec_yaml": "inputs/spec.yaml",
-  "CellAtlasBuild.wf_gtf": "http://ftp.ensembl.org/pub/release-110/gtf/homo_sapiens/Homo_sapiens.GRCh38.110.gtf.gz",
-  "CellAtlasBuild.wf_fa": "http://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
-  "CellAtlasBuild.wf_rna_r2": "inputs/rna_R1_SRR18677629.fastq.gz",
-  "CellAtlasBuild.wf_rna_r1": "inputs/rna_R2_SRR18677629.fastq.gz",
-  "CellAtlasBuild.wf_protein_feature_barcodes": "inputs/protein_feature_barcodes.txt"
-}
