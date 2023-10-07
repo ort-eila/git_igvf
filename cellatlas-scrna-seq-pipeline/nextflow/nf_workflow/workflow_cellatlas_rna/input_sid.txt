@@ -1,0 +1,20 @@
+# input reference from sid
+Array[File] fastqs
+String modality = "rna"
+File seqspec
+File genome_fasta
+File? feature_barcodes
+File genome_gtf
+File barcode_whitelist
+
+String? subpool = "none"
+String genome_name # GRCh38, mm10
+String prefix = "test-sample"
+
+#Will these be used? Need to run tests to optimize
+Int? cpus = 4
+Float? disk_factor = 1
+Float? memory_factor = 0.15
+
+#TODO:We need to setup a docker registry.
+String? docker_image = "swekhande/shareseq-prod:cellatlas-build"
