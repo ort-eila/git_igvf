@@ -9,8 +9,7 @@ nextflow.enable.dsl=2
 include {foo} from './../../nf_processes/nf_prcs_foo.nf'
 include {bar} from './../../nf_processes/nf_prcs_bar.nf'
 
-// parameters should be read from the WDL
-data = channel.fromPath('./../nf_data/*.txt')
+data = channel.fromPath('./../../nf_data/nf_data_workflow_1/*.txt')
 
 // will run the default workflow. if we have name to the workflow, we need to add an entry point
 workflow {

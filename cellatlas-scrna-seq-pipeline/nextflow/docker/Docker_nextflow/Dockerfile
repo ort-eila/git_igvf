@@ -27,9 +27,9 @@ RUN conda create -n nextflow_env python=3.8 && \
 # RUN conda install -c conda-forge jupyterlab
 
 # Copy your Nextflow script and any necessary files - this will happen with the WDL
-COPY nf_processes /nextflow_template/nf_processes
-COPY nf_data /nextflow_template/nf_data
-COPY nf_workflow/nf_workflow_call_processes.nf /nextflow_template/nf_workflow/
+# COPY nf_processes /nextflow_template/nf_processes
+# COPY nf_data /nextflow_template/nf_data
+# COPY nf_workflow/nf_workflow_call_processes.nf /nextflow_template/nf_workflow/
 
 # # FOR DEBUG on local machine
 # Expose port 8888 for Jupyter Notebook
@@ -43,9 +43,6 @@ COPY nf_workflow/nf_workflow_call_processes.nf /nextflow_template/nf_workflow/
 # 2. docker build -t eilalan/igvf_wdl_nextflow .
 # 3. docker run -it -p 8888:8888 eilalan/igvf_wdl_nextflow
 
-# OPTION 2: with wdl:
-# 1. take out the expose and the jupyter lab execution
-# 2. docker build -t eilalan/igvf_wdl_nextflow .
 
 
 # upload
