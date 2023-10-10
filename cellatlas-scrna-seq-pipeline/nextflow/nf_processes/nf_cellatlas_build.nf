@@ -5,7 +5,7 @@ process run_cellatlas_build {
   debug true
   cpus 4
   cache 'lenient'
-  container 'eilalan/cellatlas_env:latest'
+  container 'eilalan/atomic_update:latest'
 
   input:
     val modality
@@ -17,17 +17,27 @@ process run_cellatlas_build {
     path r2
     
   output:
+    path 'seqspec_out', emit: seqspec_out
     path 'rna_output', emit: cellatlas_built_rna_output
-    path 'rna_alignment_log', emit: cellatlas_built_rna_align_log
+    path 'rna_alignment_log.json', emit: cellatlas_built_rna_align_log
 
   script:
   """
-    mkdir out
-    echo $workDir
+    echo "seqspec print $spec_yaml"
+    echo "output 1: seqspec_out"
+    seqspec print $spec_yaml > seqspec_out
+    
     echo "cellatlas build -o out -m $modality -s $spec_yaml -fa $genome_fasta -g $genome_gtf -fb $feature_barcodes $r1 $r2"
-    ls > rna_output
-    ls > rna_alignment_log
+    cellatlas build -o out -m $modality -s $spec_yaml -fa $genome_fasta -g $genome_gtf -fb $feature_barcodes $r1 $r2
+    
+    jq -r '.commands[] | values[] | join(";")' out/cellatlas_info.json > jq_commands.txt
+    # Execute each command from the jq_commands.txt file
+    chmod +x jq_commands.txt
+    source jq_commands.txt 
+    tree out > tree_output
+    echo "output 2: cellatlas_built_rna_output"
+    ls output.bus  > rna_output
+    echo "output 3: cellatlas_built_rna_align_log"
+    ls out/run_info.json > rna_alignment_log.json
   """
 }
-
- // echo $cellatlasBuildCmdLine > rna_alignment_log
