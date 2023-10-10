@@ -23,6 +23,7 @@ process run_cellatlas_build {
 
   script:
   """
+    # TODO: extract the sample name
     echo "seqspec print $spec_yaml"
     echo "output 1: seqspec_out"
     seqspec print $spec_yaml > seqspec_out
@@ -39,5 +40,6 @@ process run_cellatlas_build {
     ls out/output.bus  > rna_output
     echo "output 3: rna_alignment_log.json"
     ls out/run_info.json > rna_alignment_log.json
+    # TODO: rename the outputs with the sample name that was extracted
   """
 }
