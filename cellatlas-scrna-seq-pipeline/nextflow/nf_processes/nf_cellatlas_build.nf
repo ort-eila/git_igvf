@@ -35,9 +35,9 @@ process run_cellatlas_build {
     chmod +x jq_commands.txt
     source jq_commands.txt 
     tree out > tree_output
-    echo "output 2: cellatlas_built_rna_output"
-    ls output.bus  > rna_output
-    echo "output 3: cellatlas_built_rna_align_log"
+    echo "output 2: rna_output"
+    ls out/output.bus  > rna_output
+    echo "output 3: rna_alignment_log.json"
     ls out/run_info.json > rna_alignment_log.json
   """
 }
