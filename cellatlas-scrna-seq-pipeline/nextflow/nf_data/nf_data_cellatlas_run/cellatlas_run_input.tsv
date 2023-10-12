@@ -1,0 +1,3 @@
+sample_id	fastq1	fastq2
+igvf_1	/Users/eilaarich-landkof-stanford/Documents/Code/git_igvf/cellatlas-scrna-seq-pipeline/nextflow/nf_data/nf_data_cellatlas_run/rna_R1_SRR18677629.fastq.gz	/Users/eilaarich-landkof-stanford/Documents/Code/git_igvf/cellatlas-scrna-seq-pipeline/nextflow/nf_data/nf_data_cellatlas_run/rna_R2_SRR18677629.fastq.gz
+igvf_2	/Users/eilaarich-landkof-stanford/Documents/Code/git_igvf/cellatlas-scrna-seq-pipeline/nextflow/nf_data/nf_data_cellatlas_run/rna_R1_SRR18677629.fastq.gz	/Users/eilaarich-landkof-stanford/Documents/Code/git_igvf/cellatlas-scrna-seq-pipeline/nextflow/nf_data/nf_data_cellatlas_run/rna_R2_SRR18677629.fastq.gz

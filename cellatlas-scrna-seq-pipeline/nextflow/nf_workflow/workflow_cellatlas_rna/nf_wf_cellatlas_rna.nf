@@ -11,49 +11,37 @@ include {run_seqspec} from './../../nf_processes/nf_seqspec.nf'
 include {run_cellatlas_build} from './../../nf_processes/nf_cellatlas_build.nf'
 
 workflow {
+
     // STEP 1: input processing
-    modality = params.MODALITY
+    modality = channel.value(params.MODALITY)
     println modality
 
-    spec_yaml_ch = file(params.SPEC_YAML)
-    println spec_yaml_ch
-    feature_barcodes_ch = file(params.FEATURE_BARCODES)
+    feature_barcodes_ch = channel.value(params.FEATURE_BARCODES)
     println feature_barcodes_ch
 
-    // Files whose name ends with the .gz suffix are expected to be GZIP compressed and automatically uncompressed.
-    r1_ch = Channel.fromPath(params.R1_FASTQ_GZ,checkIfExists: true)
-    println(r1_ch)
-    r2_ch = Channel.fromPath(params.R2_FASTQ_GZ,checkIfExists: true)
-    println(r2_ch)
+    fastqs_ch = Channel.fromPath(params.FASTQS_CH)
+                       .splitCsv(sep: '\t',header: true)
+                        | map { record -> [record.sample_id, record.fastq1,record.fastq2] }
+                        | unique
+                        | view
 
     // STEP  2 - download the genome - worked
-    genome_fasta_ch = file(params.GENOME_FASTA)
+    genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
     println genome_fasta_ch
 
     // STEP 3 - download the gtf
     // println params.GENOME_GZ_GTF
-    genome_gtf_ch = file(params.GENOME_GZ_GTF)
+    genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
     println genome_gtf_ch
 
-    // STEP 4 - check inputs validity
-    println modality
-    println spec_yaml_ch
-    println genome_fasta_ch
-    println genome_gtf_ch
-    println feature_barcodes_ch
-    println r1_ch
-    println r2_ch
+    // STEP  4 - download the spec_yaml
+    seqspec_yaml_ch = channel.value(file(params.SEQSPEC_PATH))
+    println seqspec_yaml_ch
 
+    // STEP 5 - call run_cellatlas_build
     // print implicit variable
     print "baseDir is $baseDir, launchDir is $launchDir, moduleDir is $moduleDir, nextflow is $nextflow, \
            params is $params, projectDir is $projectDir, workDir is $workDir, workflow is $workflow"
-    run_cellatlas_build(modality,spec_yaml_ch,genome_fasta_ch,genome_gtf_ch,feature_barcodes_ch,r1_ch,r2_ch)
-    // print(run_cellatlas_build.out.cellatlas_built_rna_output)
+    run_cellatlas_build(modality,feature_barcodes_ch,genome_fasta_ch,genome_gtf_ch,seqspec_yaml_ch,fastqs_ch)
 
-    //  worked for seqspec execution 
-    // print params.SPEC_YAML
-    // spec_yaml = channel.fromPath(params.SPEC_YAML, checkIfExists: true )     
-    // seqspec 
-    // run_seqspec(spec_yaml)
-    // run_seqspec.out.seqspec_out.view()
 }

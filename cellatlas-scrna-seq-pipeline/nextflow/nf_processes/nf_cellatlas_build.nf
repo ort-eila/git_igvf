@@ -9,37 +9,48 @@ process run_cellatlas_build {
 
   input:
     val modality
-    path spec_yaml
-    path genome_fasta
+    val feature_barcodes
+    val genome_fasta
     path genome_gtf
-    path feature_barcodes
-    path r1
-    path r2
+    path seqspec_yaml
+    tuple val(sample_id), path(fastq1), path(fastq2)
     
   output:
-    path 'seqspec_out', emit: seqspec_out
+    path '*_seqspec_out', emit: seqspec_out
     path 'rna_output', emit: cellatlas_built_rna_output
     path 'rna_alignment_log.json', emit: cellatlas_built_rna_align_log
 
   script:
   """
-    # TODO: extract the sample name
-    echo "seqspec print $spec_yaml"
-    echo "output 1: seqspec_out"
-    seqspec print $spec_yaml > seqspec_out
+    echo "sample_id is $sample_id"
+    echo "fastq1 is $fastq1"
+    echo "fastq2 is $fastq2"
+    echo "seqspec_yaml is $seqspec_yaml"
+    echo "genome_gtf is $genome_gtf"
+    echo "genome_fasta is $genome_fasta"
+    echo "feature_barcodes is $feature_barcodes"
+
+    # STEP 1: create sample_id_folder
+    echo "STEP 2: create out folder "
+    mkdir -p out/$sample_id
+  
+    echo "STEP 3: execute seqspec"
+    seqspec print $seqspec_yaml > out/$sample_id/${sample_id}_seqspec_out
+
+    echo "STEP 4: cellatlas"
+    echo "cellatlas build -o out/$sample_id/ -m $modality -s $seqspec_yaml -fa $genome_fasta -g $genome_gtf -fb $feature_barcodes $fastq1 $fastq2"
+    cellatlas build -o out/$sample_id/ -m $modality -s $seqspec_yaml -fa $genome_fasta -g $genome_gtf -fb $feature_barcodes $fastq1 $fastq2
     
-    echo "cellatlas build -o out -m $modality -s $spec_yaml -fa $genome_fasta -g $genome_gtf -fb $feature_barcodes $r1 $r2"
-    cellatlas build -o out -m $modality -s $spec_yaml -fa $genome_fasta -g $genome_gtf -fb $feature_barcodes $r1 $r2
-    
-    jq -r '.commands[] | values[] | join(";")' out/cellatlas_info.json > jq_commands.txt
-    # Execute each command from the jq_commands.txt file
-    chmod +x jq_commands.txt
-    source jq_commands.txt 
-    tree out > tree_output
-    echo "output 2: rna_output"
-    ls out/output.bus  > rna_output
-    echo "output 3: rna_alignment_log.json"
-    ls out/run_info.json > rna_alignment_log.json
-    # TODO: rename the outputs with the sample name that was extracted
+    echo "STEP 5: jq commands"
+    jq -r '.commands[] | values[] | join(";")' out/$sample_id/cellatlas_info.json > out/$sample_id/${sample_id}_jq_commands.txt
+    chmod +x out/$sample_id/${sample_id}_jq_commands.txt
+    source out/$sample_id/${sample_id}_jq_commands.txt
+
+    echo "STEP 6: tree output"
+    tree out/$sample_id > out/$sample_id/${sample_id}_tree_output
+
+    ls > 1_seqspec_out
+    ls > rna_output
+    ls > rna_alignment_log.json
   """
 }
