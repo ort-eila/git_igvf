@@ -6,7 +6,7 @@
 # rm -r /Users/eilaarich-landkof-stanford/Documents/Code/git_igvf/cellatlas-scrna-seq-pipeline/nextflow/nf_workflow/workflow_cellatlas_rna/work
 
 # rm -r /Users/eilaarich-landkof-stanford/Documents/Code/git_igvf/cellatlas-scrna-seq-pipeline/nextflow/nf_workflow/workflow_cellatlas_rna/.nextflow.log*
-# export TOWER_ACCESS_TOKEN=eyJ0aWQiOiA4Mjk3fS5jNDNmYzA4NTg2MjAxNDQzOTAwYmUzNWEzZTY0MGMyZTc0OWE3M2Mz
+./setenv.sh
 # nextflow run nf_wf_cellatlas_rna.nf -c nf_wf_cellatlas_rna.config -with-tower
 nextflow run nf_wf_cellatlas_rna.nf -c nf_wf_cellatlas_rna.config
 # eilalan/cellatlas_env:latest

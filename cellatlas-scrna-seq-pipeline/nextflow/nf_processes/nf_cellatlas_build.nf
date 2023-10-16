@@ -22,6 +22,8 @@ process run_cellatlas_build {
 
   script:
   """
+    # TODO: add random string to the sample_id (to avoid duplication in case the values are not unique)
+    # we can thake the numbers from nextflow ID string
     echo "sample_id is $sample_id"
     echo "fastq1 is $fastq1"
     echo "fastq2 is $fastq2"
@@ -44,9 +46,11 @@ process run_cellatlas_build {
     echo "STEP 5: jq commands"
     jq -r '.commands[] | values[] | join(";")' out/$sample_id/cellatlas_info.json > out/$sample_id/${sample_id}_jq_commands.txt
     chmod +x out/$sample_id/${sample_id}_jq_commands.txt
+    echo "source out/$sample_id/${sample_id}_jq_commands.txt"
     source out/$sample_id/${sample_id}_jq_commands.txt
 
     echo "STEP 6: tree output"
+    echo "out/$sample_id > out/$sample_id/${sample_id}_tree_output"
     tree out/$sample_id > out/$sample_id/${sample_id}_tree_output
 
     ls > 1_seqspec_out
