@@ -1,5 +1,3 @@
-// include {run_seqspec_print} from './../../nf_processes/nf_prcs_seqspec_print.nf'
-// include {run_seqspec_index} from './../../nf_processes/nf_prcs_seqspec_index.nf'
 include {run_synpase_download} from './../../nf_processes/nf_prcs_synapse_utils.nf'
 include {run_print} from './../../nf_processes/nf_prcs_print.nf'
 include {run_kb_ref;run_kb_count;run_download_kb_idx} from './../../nf_processes/nf_prcs_kallisto_bustools.nf'
@@ -28,8 +26,6 @@ workflow {
     .splitCsv( header: true, sep: '\t' )
     .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.spec) ) }
     .set { sample_run_ch }
-
-
 
   // STEP 3: check spec file and update as needed
   run_seqspec_print(sample_run_ch)
@@ -63,12 +59,12 @@ workflow {
   t2g_out = run_download_kb_idx.out.t2g_txt_out
 
 //  STEP 7 - a
-
+println run_seqspec_index_rna_kb.out.seqspec_index_out_file
 run_kb_count(index_out, \
-               t2g_out, \
-               genome_gtf_ch, \
-               sample_run_ch, \
-               run_seqspec_index_rna_kb.out.seqspec_index_out_file)
+             t2g_out, \
+             genome_gtf_ch, \
+             sample_run_ch, \
+             run_seqspec_index_rna_kb.out.seqspec_index_out_file)
 println run_kb_count
 
 // TODO: add QC

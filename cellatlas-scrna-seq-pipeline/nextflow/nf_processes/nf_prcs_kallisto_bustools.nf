@@ -65,6 +65,9 @@ process run_download_kb_idx {
 
 
 // read the technology 
+// #technology.map{ $technology -> file.text.trim() } .set {technology_values} 
+//   #echo $technology_values
+//   #kb count -i $index_file -g $t2g_txt -x $technology_values -o out --h5ad -t $task.cpus $fastq1 $fastq2
 //input_files.map{ file -> file.text.trim() } .set { input_values } 
 // kb count -i index.idx -g t2g.txt -x 0,0,16:0,16,28:1,0,102 -w RNA-737K-arc-v1.txt -o rna_cellatlas_out --h5ad -t 2 fastqs/rna_R1_SRR18677629.fastq.gz fastqs/rna_R2_SRR18677629.fastq.gz
 process run_kb_count {
@@ -83,16 +86,19 @@ process run_kb_count {
     path out, emit: kb_count_out
   script:
   """
-  echo start run_kb_count
+  echo start run_kb_count !!!
   echo $index_file
   echo $t2g_txt
   echo $fastq1
   echo $fastq2
   echo $technology
+  content=\$(cat $technology)
+  echo \$content
   mkdir out
-  technology.map{ file -> file.text.trim() } .set {technology_values} 
-  echo $technology_values
-  kb count -i $index_file -g $t2g_txt -x $technology_values -o out --h5ad -t $task.cpus $fastq1 $fastq2
+  echo kb count -i $index_file -g $t2g_txt -x \$content -o out --h5ad -t $task.cpus $fastq1 $fastq2
+  kb count -i $index_file -g $t2g_txt -x \$content -o out --h5ad -t $task.cpus $fastq1 $fastq2
+  ls 
+  ls out
   echo finished run_kb_count
   """
 }
