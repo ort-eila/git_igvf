@@ -7,8 +7,8 @@ nextflow.enable.dsl=2
 
 include {downloadGenome} from './../../nf_processes/nf_prcs_download_genome.nf'
 include {downloadGTF} from './../../nf_processes/nf_prcs_download_gtf.nf'
-include {run_seqspec} from './../../nf_processes/nf_seqspec.nf'
-include {run_cellatlas_build} from './../../nf_processes/nf_cellatlas_build.nf'
+include {run_seqspec_print} from './../../nf_processes/nf_prcs_seqspec_print.nf'
+include {run_cellatlas_build} from './../../nf_processes/nf_prcs_cellatlas_build.nf'
 
 workflow {
 
@@ -26,7 +26,7 @@ workflow {
                         | view
 
     // STEP  2 - download the genome - worked
-    genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
+    genome_fasta_ch = channel.value(file(${params.GENOME_FASTA}))
     println genome_fasta_ch
 
     // STEP 3 - download the gtf

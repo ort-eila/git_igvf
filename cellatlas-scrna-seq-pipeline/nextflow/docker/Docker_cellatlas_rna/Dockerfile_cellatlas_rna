@@ -47,3 +47,8 @@ RUN pip install --quiet gget kb-python
 
 # Install kallisto
 RUN pip install kallisto
+
+
+# 1. docker build -t eilalan/cellatlas_rna -f Dockerfile_cellatlas_rna .
+# 2. docker run -it eilalan/cellatlas_rna
+# 3. docker push eilalan/cellatlas_rna
