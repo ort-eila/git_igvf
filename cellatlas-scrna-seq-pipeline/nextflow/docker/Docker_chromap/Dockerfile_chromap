@@ -1,0 +1,36 @@
+# Use a Debian-based image
+FROM debian:stable-slim
+
+# To prevent time zone prompt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install necessary runtime dependencies, including nano
+RUN apt-get update && apt-get install -y \
+    tabix \
+    gcc \
+    pigz \
+    git \
+    build-essential \
+    wget \
+    zlib1g-dev \
+    nano && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a directory for Chromap
+WORKDIR /chromap
+
+# Clone Chromap from GitHub
+RUN git clone https://github.com/haowenz/chromap.git
+
+# Navigate to the directory containing the Makefile
+WORKDIR /chromap/chromap
+
+
+# Build Chromap
+RUN make
+
+# # Define an entry point or command to run Chromap
+# CMD [ "/chromap/chromap" ]
+# docker build -t eilalan/chromap_env:latest -f Dockerfile_chromap .
+# docker run -it eilalan/chromap_env:latest bash
+# docker push eilalan/chromap_env:latest
