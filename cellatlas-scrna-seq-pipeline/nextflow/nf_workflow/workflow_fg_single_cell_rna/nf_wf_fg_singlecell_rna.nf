@@ -9,17 +9,7 @@ workflow {
   println params.ENV_SYNAPSE_TOKEN
   println params.FASTQS_SPEC_CH
 
-  // This will wait for the time that we have the data from the synapse
-  // synIds_ch = Channel.fromPath(params.SYNAPSE_IDS)
-  //                    .splitCsv(header: true)
-  //                    | map { record -> tuple(record.synid_idx,record.synid_fastq1,record.synid_fastq2) }
-  //                    | view
-  // run_synpase_download(synIds_ch,params.ENV_SYNAPSE_TOKEN)
-// STEP 2: download the fastq files and the index files
-  // run_downloadFiles(files_ch)
-  // println('finished run_downloadFiles')
-
-  // BASED on https://colab.research.google.com/github/IGVF/atomic-workflows/blob/main/assays/SHARE-seq/example.ipynb#scrollTo=enZBq7G7WKI9
+  
   // STEP 1: input processing
   files_ch = Channel
     .fromPath( params.FASTQS_SPEC_CH )
@@ -58,14 +48,7 @@ workflow {
   index_out = run_download_kb_idx.out.index_out
   t2g_out = run_download_kb_idx.out.t2g_txt_out
 
-//  STEP 7 - a
-println run_seqspec_index_rna_kb.out.seqspec_index_out_file
-run_kb_count(index_out, \
-             t2g_out, \
-             genome_gtf_ch, \
-             sample_run_ch, \
-             run_seqspec_index_rna_kb.out.seqspec_index_out_file)
-println run_kb_count
+  // run chromap
 
 // TODO: add QC
 
