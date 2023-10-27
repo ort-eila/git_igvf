@@ -65,6 +65,7 @@ process run_download_kb_idx {
 
 
 // read the technology 
+// TODO: check if it possible to have 3 RNA seq?
 // #technology.map{ $technology -> file.text.trim() } .set {technology_values} 
 //   #echo $technology_values
 //   #kb count -i $index_file -g $t2g_txt -x $technology_values -o out --h5ad -t $task.cpus $fastq1 $fastq2
@@ -80,7 +81,7 @@ process run_kb_count {
     path index_file
     path t2g_txt
     path gtf_gz
-    tuple path(fastq1), path(fastq2), path(spec_yaml)
+    tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
     path technology
   output:
     path out, emit: kb_count_out

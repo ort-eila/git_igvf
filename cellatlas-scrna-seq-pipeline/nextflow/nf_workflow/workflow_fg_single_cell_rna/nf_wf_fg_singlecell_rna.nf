@@ -14,7 +14,7 @@ workflow {
   files_ch = Channel
     .fromPath( params.FASTQS_SPEC_CH )
     .splitCsv( header: true, sep: '\t' )
-    .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.spec) ) }
+    .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.R3_fastq_gz), file(row.spec) ) }
     .set { sample_run_ch }
 
   // STEP 3: check spec file and update as needed

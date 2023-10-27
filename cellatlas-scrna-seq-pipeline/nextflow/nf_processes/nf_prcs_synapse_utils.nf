@@ -53,3 +53,36 @@ process run_synpase_download {
       out.write(fastq2_fastq_gz)
   """
 }
+
+
+process run_synpase_upload {
+  debug true
+  executor = 'local' // Or specify your desired executor
+  conda 'synapseclient'
+
+  input:
+    tuple val(destination_synid_idx)
+    val token
+    path file_to_upload
+  script:
+
+  """
+    #!/usr/bin/env python
+
+    token='${token}'
+    print("token is ",token)
+
+    destination_synid_idx='${destination_synid_idx}'
+    print("destination_synid_idx is {}".format(destination_synid_idx))
+    file_to_upload='${file_to_upload}'
+    print("file_to_upload is {}".format(synid_fastq1))
+    
+    import synapseclient
+    syn = synapseclient.login(authToken=token)
+
+    file_entity = syn.File(file_to_upload, parent=destination_synid_idx)
+    syn.store(file_entity)
+    print("File copied to Synapse successfully.")
+
+  """
+}
