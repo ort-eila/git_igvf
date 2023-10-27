@@ -237,7 +237,7 @@ assay_spec:
   onlist: null
   regions:
   - !Region
-    region_id: atac_R1_SRR18677642.fastq.gz
+    region_id: atac_R1.fastq.gz
     region_type: fastq
     name: Read 1 fastq
     sequence_type: joined
@@ -257,9 +257,9 @@ assay_spec:
       max_len: 52
       onlist: null
       regions: null
-      parent_id: atac_R1_SRR18677642.fastq.gz
+      parent_id: atac_R1.fastq.gz
   - !Region
-    region_id: atac_R2_SRR18677642.fastq.gz
+    region_id: atac_R2.fastq.gz
     region_type: fastq
     name: Read 2 fastq
     sequence_type: joined
@@ -279,7 +279,7 @@ assay_spec:
       max_len: 8
       onlist: null
       regions: null
-      parent_id: atac_R2_SRR18677642.fastq.gz
+      parent_id: atac_R2.fastq.gz
     - !Region
       region_id: atac_cell_bc
       region_type: barcode
@@ -292,9 +292,9 @@ assay_spec:
         filename: ATA-737K-arc-v1_rc.txt
         md5: 3f9fc0f6ef9d72540ab010d0b5348aa1
       regions: null
-      parent_id: atac_R2_SRR18677642.fastq.gz
+      parent_id: atac_R2.fastq.gz
   - !Region
-    region_id: atac_R3_SRR18677642.fastq.gz
+    region_id: atac_R3.fastq.gz
     region_type: fastq
     name: Read 3 FASTQ
     sequence_type: joined
@@ -313,6 +313,6 @@ assay_spec:
       max_len: 52
       onlist: null
       regions: null
-      parent_id: atac_R3_SRR18677642.fastq.gz
+      parent_id: atac_R3.fastq.gz
     parent_id: atac
   parent_id: null
