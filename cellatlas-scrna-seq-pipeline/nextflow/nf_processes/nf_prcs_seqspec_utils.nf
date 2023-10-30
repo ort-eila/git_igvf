@@ -93,7 +93,7 @@ process run_seqspec_modify_atac {
   input:
     tuple path(fastq1), path(fastq2),path(fastq3), path(spec_yaml)
   output:
-    path "nf_seqspec_modify.yaml", emit: seqspec_modify_rna_out
+    path "nf_seqspec_modify.yaml", emit: seqspec_modify_atac_out
   script:
   """
   echo start run_seqspec_modify_rna

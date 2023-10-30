@@ -30,6 +30,10 @@ ENV PATH="$PATH:/chromap"
 
 # # Define an entry point or command to run Chromap
 # CMD [ "/chromap/chromap" ]
-# docker build -t eilalan/chromap_env:latest -f Dockerfile_chromap .
-# docker run -it eilalan/chromap_env:latest bash
-# docker push eilalan/chromap_env:latest
+# sudo docker build -t eilalan/chromap_env:latest -f Dockerfile_chromap .
+
+# sudo docker run -it eilalan/chromap_env:latest bash
+# sudo docker push eilalan/chromap_env:latest
+
+# wget http://ftp.ensembl.org/pub/release-109/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+# chromap -i -r Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz -o ref.index
