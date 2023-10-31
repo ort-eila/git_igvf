@@ -1,10 +1,12 @@
 // Enable DSL2
 nextflow.enable.dsl=2
+params.OUTDIR='results'
 
 // print
 process run_seqspec_print {
   debug true
   label 'bustool'
+  publishDir params.outdir, mode:'copy'
   cpus 1
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
@@ -15,7 +17,7 @@ process run_seqspec_print {
     echo start run_seqspec_print
     echo $spec_yaml
     seqspec print $spec_yaml > seqspec.print.out
-    echo finished seqspec print $spec_yaml
+    echo finished seqspec print
   """
 }
 
@@ -24,6 +26,7 @@ process run_seqspec_print {
 process run_seqspec_index_rna_kb {
   debug true
   label 'bustool'
+  publishDir params.outdir, mode:'copy'
   cpus 1
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
@@ -47,6 +50,7 @@ process run_seqspec_index_rna_kb {
 process run_seqspec_check {
   debug true
   label 'bustool'
+  publishDir params.outdir, mode:'copy'
   cpus 1
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
@@ -65,6 +69,7 @@ process run_seqspec_check {
 process run_seqspec_modify_rna {
   debug true
   label 'bustool'
+  publishDir params.outdir, mode:'copy'
   cpus 1
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
@@ -89,6 +94,7 @@ process run_seqspec_modify_rna {
 process run_seqspec_modify_atac {
   debug true
   label 'bustool'
+  publishDir params.outdir, mode:'copy'
   cpus 1
   input:
     tuple path(fastq1), path(fastq2),path(fastq3), path(spec_yaml)

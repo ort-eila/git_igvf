@@ -3,6 +3,8 @@ include {run_downloadFiles} from './../../nf_processes/nf_prcs_download_url_file
 include {run_seqspec_print;run_seqspec_check;run_seqspec_modify_atac} from './../../nf_processes/nf_prcs_seqspec_utils.nf'
 include {run_download_chromap_idx;run_create_chromap_idx;run_chromap_map_to_idx} from './../../nf_processes/nf_prcs_chromap_utils.nf'
 
+params.OUTDIR='results'
+
 workflow {
   println params.FASTQS_SPEC_CH
 
@@ -28,28 +30,27 @@ workflow {
   run_seqspec_print(sample_run_ch)
   // println ('finished run_seqspec_print')
   
-  run_seqspec_check(sample_run_ch)
+  // run_seqspec_check(sample_run_ch)
   // println ('finished run_seqspec_check')
 
-  run_seqspec_modify_atac(sample_run_ch)
+  // run_seqspec_modify_atac(sample_run_ch)
 
    // STEP  4 - download the genome
-  genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
-  println genome_fasta_ch
+  // genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
+  // println genome_fasta_ch
 
   // STEP 5 - download the gtf
-  genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
-  println genome_gtf_ch
+  // genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
+  // println genome_gtf_ch
 
 // STEP 6a: download chromap index
-  genome_chromap_idx = channel.value(file(params.CHROMAP_IDX))
-  println genome_chromap_idx
+  // genome_chromap_idx = channel.value(file(params.CHROMAP_IDX))
+  // println genome_chromap_idx
   
   // Step 6b: create chromap index - make sure that you have enough resources
   // run_create_chromap_idx(genome_fasta_ch)
   
   // map the fastq files to the idx and fa file. genome_chromap_idx
-  run_chromap_map_to_idx(genome_chromap_idx,genome_fasta_ch,sample_run_ch)
-  println run_chromap_map_to_idx
-
+  // run_chromap_map_to_idx(genome_chromap_idx,genome_fasta_ch,sample_run_ch)
+  // println run_chromap_map_to_idx
 }
