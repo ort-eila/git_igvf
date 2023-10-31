@@ -1,13 +1,25 @@
 // Enable DSL2
 nextflow.enable.dsl=2
-params.OUTDIR='results'
+
+
+// test
+process run_seqspec_test {
+  debug true
+  label 'seqspec'
+  output:
+    path "test.txt" , emit: test_out
+  script:
+  """
+    echo start_run_seqspec_test
+    touch test.txt
+    echo run_seqspec_test_end
+  """
+}
 
 // print
 process run_seqspec_print {
   debug true
-  label 'bustool'
-  publishDir params.outdir, mode:'copy'
-  cpus 1
+  label 'seqspec'
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
   output:
@@ -25,9 +37,7 @@ process run_seqspec_print {
 // seqspec index -t kb -m rna -r $RNA_R1_fastq_gz,$RNA_R2_fastq_gz $spec_yaml
 process run_seqspec_index_rna_kb {
   debug true
-  label 'bustool'
-  publishDir params.outdir, mode:'copy'
-  cpus 1
+  label 'seqspec'
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
     path modified_spec_yaml
@@ -49,9 +59,8 @@ process run_seqspec_index_rna_kb {
 // check
 process run_seqspec_check {
   debug true
-  label 'bustool'
+  label 'seqspec'
   publishDir params.outdir, mode:'copy'
-  cpus 1
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
   output:
@@ -68,9 +77,7 @@ process run_seqspec_check {
 // TODO: check if RNA can have multiple fastq files
 process run_seqspec_modify_rna {
   debug true
-  label 'bustool'
-  publishDir params.outdir, mode:'copy'
-  cpus 1
+  label 'seqspec'
   input:
     tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
   output:
@@ -93,9 +100,7 @@ process run_seqspec_modify_rna {
 
 process run_seqspec_modify_atac {
   debug true
-  label 'bustool'
-  publishDir params.outdir, mode:'copy'
-  cpus 1
+  label 'seqspec'
   input:
     tuple path(fastq1), path(fastq2),path(fastq3), path(spec_yaml)
   output:

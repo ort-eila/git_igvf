@@ -1,6 +1,6 @@
 include {run_synpase_download} from './../../nf_processes/nf_prcs_synapse_utils.nf'
 include {run_downloadFiles} from './../../nf_processes/nf_prcs_download_url_files.nf'
-include {run_seqspec_print;run_seqspec_check;run_seqspec_modify_atac} from './../../nf_processes/nf_prcs_seqspec_utils.nf'
+include {run_seqspec_test;run_seqspec_print;run_seqspec_check;run_seqspec_modify_atac} from './../../nf_processes/nf_prcs_seqspec_utils.nf'
 include {run_download_chromap_idx;run_create_chromap_idx;run_chromap_map_to_idx} from './../../nf_processes/nf_prcs_chromap_utils.nf'
 
 params.OUTDIR='results'
@@ -20,14 +20,15 @@ workflow {
 
   // BASED on https://colab.research.google.com/github/IGVF/atomic-workflows/blob/main/assays/SHARE-seq/example.ipynb#scrollTo=enZBq7G7WKI9
   // STEP 1: input processing
-  files_ch = Channel
-    .fromPath( params.FASTQS_SPEC_CH )
-    .splitCsv( header: true, sep: '\t' )
-    .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.R3_fastq_gz),file(row.spec) ) }
-    .set { sample_run_ch }
+  // files_ch = Channel
+  //   .fromPath( params.FASTQS_SPEC_CH )
+  //   .splitCsv( header: true, sep: '\t' )
+  //   .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.R3_fastq_gz),file(row.spec) ) }
+  //   .set { sample_run_ch }
 
+  run_seqspec_test()
   // STEP 3: check spec file and update as needed
-  run_seqspec_print(sample_run_ch)
+  // run_seqspec_print(sample_run_ch)
   // println ('finished run_seqspec_print')
   
   // run_seqspec_check(sample_run_ch)
