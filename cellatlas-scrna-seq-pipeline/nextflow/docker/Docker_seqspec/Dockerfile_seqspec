@@ -33,3 +33,7 @@ RUN pip install --quiet git+https://github.com/IGVF/seqspec.git
 # sudo docker build -t eilalan/seqspec_env:latest -f Dockerfile_seqspec .
 # sudo docker run -it eilalan/seqspec_env:latest bash
 # sudo docker push eilalan/seqspec_env:latest
+
+
+# multienv - to try
+# sudo docker build -t --platform --platform linux/amd64,linux/arm64 eilalan/seqspec_env:latest -f Dockerfile_seqspec .

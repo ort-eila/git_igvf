@@ -31,7 +31,6 @@ ENV PATH="$PATH:/chromap"
 # # Define an entry point or command to run Chromap
 # CMD [ "/chromap/chromap" ]
 # sudo docker build -t eilalan/chromap_env:latest -f Dockerfile_chromap .
-
 # sudo docker run -it eilalan/chromap_env:latest bash
 # sudo docker push eilalan/chromap_env:latest
 

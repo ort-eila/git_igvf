@@ -27,7 +27,7 @@ process run_create_chromap_idx {
 }
 
 process run_chromap_map_to_idx {
-  label 'chromap'
+  label 'chromap_idx'
   debug true
   input:
     path chromap_idx
