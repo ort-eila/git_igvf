@@ -1,8 +1,22 @@
 // Enable DSL2
 nextflow.enable.dsl=2
 
-
 // print
+
+process run_seqspec_test {
+  debug true
+  label 'seqspec_local'
+  output:
+    path "seqspec.print.out" , emit: seqspec_out
+  script:
+  """
+    echo start run_seqspec_test
+    echo The path is: $PATH
+    touch seqspec.print.out
+    echo finished run_seqspec_test
+  """
+}
+
 process run_seqspec_print {
   debug true
   label 'seqspec_local'
@@ -14,7 +28,7 @@ process run_seqspec_print {
   """
     echo start run_seqspec_print
     echo $spec_yaml
-    seqspec print $spec_yaml > seqspec.print.out
+    seqspec print $spec_yaml -o seqspec.print.out
     echo finished seqspec print
   """
 }
@@ -71,7 +85,6 @@ process run_seqspec_modify_rna {
   echo $fastq2
   echo $fastq3
   echo $spec_yaml
-  ls
   seqspec modify -m rna -o modrna1.yaml -r rna_R1.fastq.gz --region-id $fastq1 $spec_yaml
   seqspec modify -m rna -o modrna2.yaml -r rna_R2.fastq.gz --region-id $fastq2 modrna1.yaml
   seqspec modify -m rna -o nf_seqspec_modify.yaml -r rna_R2.fastq.gz --region-id $fastq2 modrna2.yaml

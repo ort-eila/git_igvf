@@ -1,9 +1,7 @@
 include {run_synpase_download} from './../../nf_processes/nf_prcs_synapse_utils.nf'
 include {run_downloadFiles} from './../../nf_processes/nf_prcs_download_url_files.nf'
-include {run_seqspec_print;run_seqspec_check;run_seqspec_modify_atac} from './../../nf_processes/nf_prcs_seqspec_utils.nf'
-include {run_download_chromap_idx;run_create_chromap_idx;run_chromap_map_to_idx} from './../../nf_processes/nf_prcs_chromap_utils.nf'
-
-params.OUTDIR='results'
+include {run_seqspec_print;run_seqspec_check;run_seqspec_modify_atac;run_seqspec_test} from './../../nf_processes/nf_prcs_seqspec_utils.nf'
+include {run_download_chromap_idx;run_create_chromap_idx;run_chromap_map_to_idx;run_chromap_test} from './../../nf_processes/nf_prcs_chromap_utils.nf'
 
 workflow {
   println params.FASTQS_SPEC_CH
@@ -25,8 +23,11 @@ workflow {
     .splitCsv( header: true, sep: '\t' )
     .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.R3_fastq_gz),file(row.spec) ) }
     .set { sample_run_ch }
-    
+  
+  //println ('calling run_seqspec_test')
+  //run_seqspec_test()
   // STEP 3: check spec file and update as needed
+  println ('calling run_seqspec_print')
   run_seqspec_print(sample_run_ch)
   println ('finished run_seqspec_print')
   
@@ -42,22 +43,30 @@ workflow {
   run_seqspec_modify_atac(sample_run_ch)
   println ('finish run_seqspec_modify_atac')
 
-   // STEP  4 - download the genome
+  //println ('call run_chromap_test')
+  //run_chromap_test()
+  // STEP  4 - download the genome
+  println ('start genome_fasta_ch download')
   genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
-  println genome_fasta_ch
+  println ('finished genome_fasta_ch download')
 
   // STEP 5 - download the gtf
+  println ('start genome_gtf_ch download')
   genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
-  println genome_gtf_ch
+  println ('finished genome_gtf_ch download')
 
-// STEP 6a: download chromap index
+  // STEP 6a: download chromap index
+  println ('start genome_chromap_idx download')
   genome_chromap_idx = channel.value(file(params.CHROMAP_IDX))
-  println genome_chromap_idx
+  println ('finished genome_chromap_idx download')
   
   // Step 6b: create chromap index - make sure that you have enough resources
+  // println ('start run_create_chromap_idx')
   // run_create_chromap_idx(genome_fasta_ch)
+  // println ('stop run_create_chromap_idx download')
   
   // map the fastq files to the idx and fa file. genome_chromap_idx
+  println ('start run_chromap_map_to_idx')
   run_chromap_map_to_idx(genome_chromap_idx,genome_fasta_ch,sample_run_ch)
-  println run_chromap_map_to_idx
+  println ('finished run_chromap_map_to_idx')
 }

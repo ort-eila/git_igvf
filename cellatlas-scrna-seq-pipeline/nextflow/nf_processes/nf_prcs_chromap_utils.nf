@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 process run_download_chromap_idx {
-  label 'chromap'
+  label 'chromap_local'
   debug true
   script:
   """
@@ -45,5 +45,16 @@ process run_chromap_map_to_idx {
     echo 'spec_yaml is $spec_yaml'
     chromap -x $chromap_idx -r $ref_fa -1 $fastq1 -2 $fastq2 -o map_bed_file.bed
     echo 'finished map_bed_file.bed'
+    """
+  }
+
+process run_chromap_test {
+  label 'chromap_local'
+  debug true
+   script:
+    """
+    echo run_chromap_test
+    chromap
+    echo run_chromap_test_end
     """
   }
