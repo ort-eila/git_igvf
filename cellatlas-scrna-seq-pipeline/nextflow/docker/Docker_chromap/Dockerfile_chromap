@@ -4,14 +4,15 @@ FROM debian:stable-slim
 # To prevent time zone prompt
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install necessary runtime dependencies, including nano
 RUN apt-get update && apt-get install -y \
     tabix \
     gcc \
     pigz \
     git \
+    tar \
     build-essential \
     wget \
+    procps \
     zlib1g-dev \
     nano && \
     rm -rf /var/lib/apt/lists/*
