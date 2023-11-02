@@ -56,17 +56,17 @@ workflow {
   println ('finished genome_gtf_ch download')
 
   // STEP 6a: download chromap index
-  println ('start genome_chromap_idx download')
-  genome_chromap_idx = channel.value(file(params.CHROMAP_IDX))
-  println ('finished genome_chromap_idx download')
+  // println ('start genome_chromap_idx download')
+  // genome_chromap_idx = channel.value(file(params.CHROMAP_IDX))
+  // println ('finished genome_chromap_idx download')
   
   // Step 6b: create chromap index - make sure that you have enough resources
-  // println ('start run_create_chromap_idx')
-  // run_create_chromap_idx(genome_fasta_ch)
-  // println ('stop run_create_chromap_idx download')
+  println ('start run_create_chromap_idx')
+  run_create_chromap_idx(genome_fasta_ch)
+  println ('finished run_create_chromap_idx')
   
   // map the fastq files to the idx and fa file. genome_chromap_idx
-  println ('start run_chromap_map_to_idx')
-  run_chromap_map_to_idx(genome_chromap_idx,genome_fasta_ch,sample_run_ch)
-  println ('finished run_chromap_map_to_idx')
+  // println ('start run_chromap_map_to_idx')
+  // run_chromap_map_to_idx(genome_chromap_idx,genome_fasta_ch,sample_run_ch)
+  // println ('finished run_chromap_map_to_idx')
 }

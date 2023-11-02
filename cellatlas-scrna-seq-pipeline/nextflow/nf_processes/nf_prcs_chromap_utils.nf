@@ -43,7 +43,7 @@ process run_chromap_map_to_idx {
     echo 'fastq2 is $fastq2'
     echo 'fastq3 is $fastq3'
     echo 'spec_yaml is $spec_yaml'
-    chromap -x $chromap_idx -r $ref_fa -1 $fastq1 -2 $fastq2 -o map_bed_file.bed
+    chromap -x $chromap_idx -r $ref_fa -1 $fastq1 -2 $fastq3 -o map_bed_file.bed
     echo 'finished map_bed_file.bed'
     """
   }
