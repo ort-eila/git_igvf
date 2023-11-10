@@ -39,3 +39,7 @@ RUN conda activate cellatlas_env && \
 # 2. docker build -t eilalan/cellatlas_env .
 # 3. docker run -it -p 8888:8888 eilalan/cellatlas_env
 # 4. docker push eilalan/cellatlas_env
+
+# sudo docker build -t eilalan/chromap_env:latest -f Dockerfile_chromap .
+# sudo docker run -it eilalan/chromap_env:latest bash
+# sudo docker push eilalan/chromap_env:latest
