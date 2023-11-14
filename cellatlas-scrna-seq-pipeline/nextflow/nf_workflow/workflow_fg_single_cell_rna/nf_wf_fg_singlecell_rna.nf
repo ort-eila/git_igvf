@@ -17,11 +17,11 @@ workflow {
     .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.R3_fastq_gz), file(row.spec), file(row.whitelist) ) }
     .set { sample_run_ch }
 
-  // STEP 3: modify seqspec with the file names
+  // STEP 2: modify seqspec with the file names
   run_seqspec_modify_rna(sample_run_ch)
   println ('after run_seqspec_modify_rna')
   
-  // STEP 2: print spec file after update - seqspec_modify_rna_out
+  // STEP 3: print spec file after update - seqspec_modify_rna_out
   run_seqspec_print(run_seqspec_modify_rna.out.seqspec_modify_rna_out)
   println ('after run_seqspec_print')
 
@@ -47,8 +47,8 @@ workflow {
   t2g_out = run_kb_ref.out.t2g_txt_out
 
   // STEP 6b-1: get the organism name
-  //genome_idx_org_ch = channel.value(params.ORGANISM)
-  //println ('after get organism')
+  genome_idx_org_ch = channel.value(params.ORGANISM)
+  println ('after get organism')
   
   // STEP 6b-2: download the index of the organims
   //run_download_kb_idx(genome_idx_org_ch)
@@ -62,14 +62,19 @@ workflow {
   adata = run_kb_count.out.adata_out_h5ad
   
   // STEP 8: QC - for the test, will get a count H5 from the parameters
-  subpool = channel.value(params.SUBPOOL)
-  scrna_calculate_qc_metrics(adata,subpool)
-  scrna_qc_metrics_csv=scrna_calculate_qc_metrics.out.rna_qc_metrics_csv
+  subpool = params.SUBPOOL
+  //adata_file = file(params.ANNDATA_FILE)
+  //println 'params.ANNDATA_FILE is: ' + params.ANNDATA_FILE
+  //println 'adata_file is: ' + adata_file
+  sc_rna_qc_script = params.SC_RNA_QC_SCRIPT
+  scrna_calculate_qc_metrics(sc_rna_qc_script,adata)
+  scrna_qc_metrics_tsv=scrna_calculate_qc_metrics.out.rna_qc_metrics_tsv
+  println 'scrna_qc_metrics_tsv is: '+ scrna_qc_metrics_tsv
   
   // STEP 9: QC - plot the elbow
   //umi_cutoff = channel.value(file(params.UMI_CUTOFF))
   //gene_cutoff = channel.value(file(params.GENE_CUTOFF))
-  //scrna_plot_qc_metrics(scrna_qc_metrics_csv,umi_cutoff,gene_cutoff)
+  //scrna_plot_qc_metrics(scrna_qc_metrics_tsv,umi_cutoff,gene_cutoff)
     // out:
     //val umi_barcode_rank_plot
     //val gene_barcode_rank_plot

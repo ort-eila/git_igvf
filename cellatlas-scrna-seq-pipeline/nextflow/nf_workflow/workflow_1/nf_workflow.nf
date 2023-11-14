@@ -8,6 +8,7 @@ nextflow.enable.dsl=2
 
 include {foo} from './../../nf_processes/nf_prcs_foo.nf'
 include {bar} from './../../nf_processes/nf_prcs_bar.nf'
+include {call_test} from './../../nf_processes/nf_prcs_py_script.nf'
 
 data = channel.fromPath('./../../nf_data/nf_data_workflow_1/*.txt')
 
@@ -21,8 +22,9 @@ workflow {
     // bar(foo(data))
 
     // option 3:
-    foo(data)
-    foo.out.view()
-    bar(foo.out)
-    bar.out.view()
+    //foo(data)
+    //foo.out.view()
+    //bar(foo.out)
+    //bar.out.view()
+    call_test()
 }
