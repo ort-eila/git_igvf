@@ -13,7 +13,6 @@ nextflow.enable.dsl=2
 process run_kb_ref {
   label 'kb_ref'
   debug true
-  // conda 'kb-python'
   input:
     path dna_assempbly_fa_gz
     path gtf_gz
@@ -24,7 +23,7 @@ process run_kb_ref {
   """
   echo dna_assempbly_fa_gz is $dna_assempbly_fa_gz
   echo gtf_gz is $gtf_gz
-  kb ref --tmp tmp2 --overwrite -k 21 -i index.idx -g t2g.txt -f1 transcriptome.fa $dna_assempbly_fa_gz $gtf_gz
+  kb ref --tmp tmp2 --overwrite -i index.idx -g t2g.txt -f1 transcriptome.fa $dna_assempbly_fa_gz $gtf_gz
   echo finished callling kb ref
   """
 }

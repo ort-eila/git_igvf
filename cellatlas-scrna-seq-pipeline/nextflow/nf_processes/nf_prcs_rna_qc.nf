@@ -8,6 +8,7 @@ process scrna_calculate_qc_metrics {
   input:
     val qc_python_script
     path anndata_file
+    val subpool_val
   output:
     path 'sc_rna_qc_calculate.tsv', emit: rna_qc_metrics_tsv
   script:
@@ -21,16 +22,18 @@ process scrna_calculate_qc_metrics {
 
     # Execute the Python script
     adata_file=$anndata_file
+    subpool_arg="--subpool $subpool_val"  # Add --subpool argument
     echo "Adata path: \$adata_file"
-    
+    echo "Subpool argument: \$subpool_arg"
+
     # Print start of scrna_calculate_qc_metrics
     echo "Starting scrna_calculate_qc_metrics..."
 
     # Redirect detailed debugging information to a file
-    detailed_debug_info="detailed_debug_info.log"
+    detailed_debug_info="detailed_debug_info_rna_metrics.log"
 
     # Execute the Python script and capture the result file path
-    result_file_path=\$(conda run -n rna_qc_env python \$script_path --adata \$adata_file > \$detailed_debug_info 2>&1)
+    result_file_path=\$(conda run -n rna_qc_env python \$script_path --adata \$adata_file \$subpool_arg > \$detailed_debug_info 2>&1)
 
     # Print the result file path
     echo "Result file path: \$result_file_path"
