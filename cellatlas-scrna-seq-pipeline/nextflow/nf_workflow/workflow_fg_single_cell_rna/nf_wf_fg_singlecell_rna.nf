@@ -18,37 +18,37 @@ workflow {
     .set { sample_run_ch }
 
   // STEP 2: modify seqspec with the file names
-  //run_seqspec_modify_rna(sample_run_ch)
-  //println ('after run_seqspec_modify_rna')
+  run_seqspec_modify_rna(sample_run_ch)
+  println ('after run_seqspec_modify_rna')
   
   // STEP 3: print spec file after update - seqspec_modify_rna_out
-  //run_seqspec_print(run_seqspec_modify_rna.out.seqspec_modify_rna_out)
-  //println ('after run_seqspec_print')
+  run_seqspec_print(run_seqspec_modify_rna.out.seqspec_modify_rna_out)
+  println ('after run_seqspec_print')
 
   // STEP 4: get the index parameter
-  //run_seqspec_index_rna_kb(sample_run_ch,run_seqspec_modify_rna.out.seqspec_modify_rna_out)
-  //println ('after run_seqspec_index_rna_kb')
-  //technology = run_seqspec_index_rna_kb.out.seqspec_technology_out_file
-  //println ('technology is $technology')
+  run_seqspec_index_rna_kb(sample_run_ch,run_seqspec_modify_rna.out.seqspec_modify_rna_out)
+  println ('after run_seqspec_index_rna_kb')
+  technology = run_seqspec_index_rna_kb.out.seqspec_technology_out_file
+  println ('technology is $technology')
   
   // STEP 4: download the genome FA
-  //genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
-  //println ('after genome_fasta_ch')
+  genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
+  println ('after genome_fasta_ch')
 
   // STEP 5: download the geonme gtf
-  //genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
-  //println ('after genome_gtf_ch')
+  genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
+  println ('after genome_gtf_ch')
 
   // STEP 6a: SIG KILL 9 - probably something with the machine properties
   // on a bigger machine with CPU. workaround - download reference
-  //run_kb_ref(genome_fasta_ch, genome_gtf_ch)
-  //println ('after run_kb_ref')
-  //index_out = run_kb_ref.out.index_out
-  //t2g_out = run_kb_ref.out.t2g_txt_out
+  run_kb_ref(genome_fasta_ch, genome_gtf_ch)
+  println ('after run_kb_ref')
+  index_out = run_kb_ref.out.index_out
+  t2g_out = run_kb_ref.out.t2g_txt_out
 
   // STEP 6b-1: get the organism name
-  //genome_idx_org_ch = channel.value(params.ORGANISM)
-  //println ('after get organism')
+  genome_idx_org_ch = channel.value(params.ORGANISM)
+  println ('after get organism')
   
   // STEP 6b-2: download the index of the organims
   //run_download_kb_idx(genome_idx_org_ch)
@@ -57,9 +57,9 @@ workflow {
   //t2g_out = run_download_kb_idx.out.t2g_txt_out
   
   // STEP 7: run alignment run_kb_count input: path index_file,path t2g_txt,path gtf_gz,tuple path(fastq1),path(fastq2),path(fastq3), path(spec_yaml),path technology
-  //run_kb_count(index_out,t2g_out,genome_gtf_ch,sample_run_ch,technology)
-  //println ('after run_kb_count')
-  //adata = run_kb_count.out.adata_out_h5ad
+  run_kb_count(index_out,t2g_out,genome_gtf_ch,sample_run_ch,technology)
+  println ('after run_kb_count')
+  adata = run_kb_count.out.adata_out_h5ad
   
   // STEP 8: QC - for the test, will get a count H5 from the parameters
   // debug start
@@ -68,27 +68,32 @@ workflow {
   //println 'adata_file is: ' + adata_file
   // debug end 
   // TODO: change the subpool to be part of the csv input file
-  //subpool = channel.value(params.SUBPOOL)
-  //sc_rna_qc_script = params.SC_RNA_QC_SCRIPT
-  //scrna_calculate_qc_metrics(sc_rna_qc_script,adata,subpool)
-  //scrna_qc_metrics_tsv=scrna_calculate_qc_metrics.out.rna_qc_metrics_tsv
-  //println 'scrna_qc_metrics_tsv is: '+ scrna_qc_metrics_tsv
+  subpool = channel.value(params.SUBPOOL)
+  sc_rna_qc_script = params.SC_RNA_QC_SCRIPT
+  scrna_calculate_qc_metrics(sc_rna_qc_script,adata,subpool)
+  scrna_qc_metrics_tsv=scrna_calculate_qc_metrics.out.rna_qc_metrics_tsv
+  println 'scrna_qc_metrics_tsv is: '+ scrna_qc_metrics_tsv
   
   // STEP 9: QC - plot the elbow
   umi_cutoff = params.UMI_CUTOFF
   gene_cutoff = params.GENE_CUTOFF
-  scrna_qc_metrics_tsv = file(params.RNA_DEBUG_QC)
+  // start debug
+  //scrna_qc_metrics_tsv = file(params.RNA_DEBUG_QC)
+  // end debug
+  
   println 'scrna_qc_metrics_tsv is: '+ scrna_qc_metrics_tsv
+  
   sc_rna_qc_plot_script = params.SC_RNA_QC_PLOT_SCRIPT
   println 'sc_rna_qc_plot_script is: '+ sc_rna_qc_plot_script
+  
   sc_rna_qc_plot_helper_script = params.SC_RNA_QC_PLOT_HELPER_SCRIPT
   println 'sc_rna_qc_plot_helper_script is: '+ sc_rna_qc_plot_helper_script
     
   scrna_plot_qc_metrics_prcs(sc_rna_qc_plot_script,sc_rna_qc_plot_helper_script,scrna_qc_metrics_tsv,umi_cutoff,gene_cutoff, \
                              'umi_rank_plot_all_output.png','umi_rank_plot_top_output.png','gene_umi_plot_file_output.png')
     // out:
-    //val umi_barcode_rank_plot
-    //val gene_barcode_rank_plot
-    //val gene_umi_scatter_plot
+    //val umi_rank_plot_all
+    //val umi_rank_plot_top
+    //val gene_umi_plot_file
     
 }
