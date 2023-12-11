@@ -8,6 +8,7 @@ include {run_bgzip} from './../../nf_processes/nf_prcs_bgzip.nf'
 include {run_tabix;run_tabix_filtered_fragments} from './../../nf_processes/nf_prcs_tabix.nf'
 include {run_merge_logs} from './../../nf_processes/nf_prcs_merge_logs.nf'
 include {run_filter_fragments} from './../../nf_processes/nf_prcs_filter_fragments.nf'
+include {run_tss} from './../../nf_processes/nf_prcs_tss.nf'
 
 workflow {
   println params.FASTQS_SPEC_CH
@@ -104,50 +105,7 @@ workflow {
   run_tabix_filtered_fragments(params.RUN_TABIX_SCRIPT,run_filter_fragments.out.filtered_fragment_file_out)
   
   // STEP 14: run tss 
-  // STEP 9: merge log file. two inputs from the previous execution: alignment_log & barcode_log
-  //println ('calling run_seqspec_test')
-  //run_seqspec_test()
-  // STEP 3: check spec file and update as needed
-  //*println ('calling run_seqspec_print')
-  //*run_seqspec_print(sample_run_ch)
-  //*println ('finished run_seqspec_print')
-  
-  // There is a bug with the online on the new version
-  //   File "/opt/conda/lib/python3.11/site-packages/seqspec/Region.py", line 242, in to_dict
-  // "location": self.location,
-  //              ^^^^^^^^^^^^^
-  //AttributeError: 'Onlist' object has no attribute 'location'
-  //run_seqspec_check(sample_run_ch)
-  //println ('finished run_seqspec_check')
-
-  //*println ('start run_seqspec_modify_atac')
-  //*run_seqspec_modify_atac(sample_run_ch)
-  //*println ('finish run_seqspec_modify_atac')
-
-  //println ('call run_chromap_test')
-  //run_chromap_test()
-  // STEP  4 - download the genome
-  //*println ('start genome_fasta_ch download')
-  //*genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
-  //*println ('finished genome_fasta_ch download')
-
-  // STEP 5 - download the gtf
-  //*println ('start genome_gtf_ch download')
-  //*genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
-  //*println ('finished genome_gtf_ch download')
-
-  // STEP 6a: download chromap index
-  // println ('start genome_chromap_idx download')
-  // genome_chromap_idx = channel.value(file(params.CHROMAP_IDX))
-  // println ('finished genome_chromap_idx download')
-  
-  // Step 6b: create chromap index - make sure that you have enough resources
-  //*println ('start run_create_chromap_idx')
-  //*run_create_chromap_idx(genome_fasta_ch)
-  //*println ('finished run_create_chromap_idx')
-  
-  // map the fastq files to the idx and fa file. genome_chromap_idx
-  // println ('start run_chromap_map_to_idx')
-  // run_chromap_map_to_idx(genome_chromap_idx,genome_fasta_ch,sample_run_ch)
-  // println ('finished run_chromap_map_to_idx')
+  println ('before call run_tss')
+  run_tss(run_tabix_filtered_fragments.out.tbi_fragments_out)
+  println ('after call run_tss')
 }
