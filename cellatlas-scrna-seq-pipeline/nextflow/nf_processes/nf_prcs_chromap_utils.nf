@@ -1,16 +1,6 @@
 // Enable DSL2
 nextflow.enable.dsl=2
 
-process run_download_chromap_idx {
-  label 'chromap_local'
-  debug true
-  script:
-  """
-  echo 'run_download_chromap_idx'
-  chromap 
-  """
-}
-
 process run_create_chromap_idx {
   label 'chromap_idx'
   debug true
@@ -26,15 +16,19 @@ process run_create_chromap_idx {
   """
 }
 
+//-b ~{sep="," input.fastq_barcode}
 process run_chromap_map_to_idx {
   label 'chromap_map_idx'
   debug true
   input:
     path chromap_idx
     path ref_fa
-    tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml)
+    tuple path(fastq1), path(fastq2), path(fastq3), path(spec_yaml),path(whitelist_file)
+    val  chromap_trim_adaptor
   output:
     path "map_bed_file.bed", emit: chromap_map_bed_path
+    path "summary_file.csv", emit: chromap_map_summary_mapping_statistics
+    path "alignment_log", emit: chromap_map_alignment_log
   script:
     """
     echo $chromap_idx
@@ -43,8 +37,10 @@ process run_chromap_map_to_idx {
     echo 'fastq2 is $fastq2'
     echo 'fastq3 is $fastq3'
     echo 'spec_yaml is $spec_yaml'
-    chromap -x $chromap_idx -r $ref_fa -1 $fastq1 -2 $fastq3 -o map_bed_file.bed
-    echo 'finished map_bed_file.bed'
+    echo 'chromap_trim_adaptor is $chromap_trim_adaptor'
+    echo 'task.cpus is $task.cpus. should be 32. TODO: check what is the issue'
+    chromap -x $chromap_idx -r $ref_fa -t ${task.cpus} -1 $fastq1 -2 $fastq3 -o map_bed_file.bed --summary summary_file.csv > alignment_log 2>&1
+    echo 'finished run_chromap_map_to_idx'
     """
   }
 
@@ -52,7 +48,7 @@ process run_chromap_test {
   label 'chromap_local'
   debug true
    script:
-    """
+   """
     echo run_chromap_test
     chromap
     echo run_chromap_test_end

@@ -1,10 +1,17 @@
-include {run_synpase_download} from './../../nf_processes/nf_prcs_synapse_utils.nf'
+// ATAC workflow
+//include {} from './../../nf_processes/'
+//include {run_synpase_download} from './../../nf_processes/nf_prcs_synapse_utils.nf'
 include {run_downloadFiles} from './../../nf_processes/nf_prcs_download_url_files.nf'
-include {run_seqspec_print;run_seqspec_check;run_seqspec_modify_atac;run_seqspec_test} from './../../nf_processes/nf_prcs_seqspec_utils.nf'
-include {run_download_chromap_idx;run_create_chromap_idx;run_chromap_map_to_idx;run_chromap_test} from './../../nf_processes/nf_prcs_chromap_utils.nf'
+include {run_seqspec_print;run_seqspec_modify_atac} from './../../nf_processes/nf_prcs_seqspec_utils.nf'
+include {run_create_chromap_idx;run_chromap_map_to_idx;run_chromap_test} from './../../nf_processes/nf_prcs_chromap_utils.nf'
+include {run_bgzip} from './../../nf_processes/nf_prcs_bgzip.nf'
+include {run_tabix;run_tabix_filtered_fragments} from './../../nf_processes/nf_prcs_tabix.nf'
+include {run_merge_logs} from './../../nf_processes/nf_prcs_merge_logs.nf'
+include {run_filter_fragments} from './../../nf_processes/nf_prcs_filter_fragments.nf'
 
 workflow {
   println params.FASTQS_SPEC_CH
+  println params.ENV_SYNAPSE_TOKEN
 
   // This will wait for the time that we have the data from the synapse
   // synIds_ch = Channel.fromPath(params.SYNAPSE_IDS)
@@ -12,24 +19,98 @@ workflow {
   //                    | map { record -> tuple(record.synid_idx,record.synid_fastq1,record.synid_fastq2) }
   //                    | view
   // run_synpase_download(synIds_ch,params.ENV_SYNAPSE_TOKEN)
-// STEP 2: download the fastq files and the index files
-  // run_downloadFiles(files_ch)
-  // println('finished run_downloadFiles')
-
-  // BASED on https://colab.research.google.com/github/IGVF/atomic-workflows/blob/main/assays/SHARE-seq/example.ipynb#scrollTo=enZBq7G7WKI9
+    
   // STEP 1: input processing
-  Channel
+  files_ch = Channel
     .fromPath( params.FASTQS_SPEC_CH )
     .splitCsv( header: true, sep: '\t' )
-    .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.R3_fastq_gz),file(row.spec) ) }
+    .map { row -> tuple( file(row.R1_fastq_gz), file(row.R2_fastq_gz), file(row.R3_fastq_gz), file(row.spec), file(row.whitelist)) }
     .set { sample_run_ch }
+
+  // STEP 2: modify seqspec with the file names
+  run_seqspec_modify_atac(sample_run_ch)
+  println ('after run_seqspec_modify_atac')
   
+  // STEP 3: print spec file after update - seqspec_modify_rna_out
+  run_seqspec_print(run_seqspec_modify_atac.out.seqspec_modify_atac_out)
+  println ('after run_seqspec_print')
+  
+  // STEP 4: run_chromap_test
+  run_chromap_test()
+  println ('after run_chromap_test')
+  
+  // STEP 5: download the genome FA
+  genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
+  println ('after genome_fasta_ch')
+  
+  // STEP 6: download the geonme gtf
+  genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
+  println ('after genome_gtf_ch')
+  
+  // STEP 7a: download chromap index
+  genome_chromap_idx = channel.value(file(params.CHROMAP_IDX))
+  println ('after genome_chromap_idx download')
+  
+  // STEP 8: run_chromap_map_to_idx
+  println ('chromap parameters')
+  println params.CHROMAP_TRIM_ADAPTERS
+  println params.CHROMAP_REMOVE_PCR_DUPLICATES
+  println params.CHROMAP_REMOVE_PCR_DUPLICATES_AT_CELL_LEVEL
+  println params.CHROMAP_TN5_SHIFT
+  println params.CHROMAP_LOW_MEM
+  println params.CHROMAP_BED
+  println params.CHROMAP_MAX_INSERT_SIZE
+  println params.CHROMAP_BC_ERROR_THRESHOLD
+  println params.CHROMAP_BC_PROBABILITY_THRESHOLD
+  println params.READ_FORMAT
+  println params.DROP_REPETITIVE_THRESHOLD
+  println params.MAPQ_THRESHOLD
+  println params.BARCODE_TRANSLATE
+  run_chromap_map_to_idx(genome_chromap_idx,genome_fasta_ch,sample_run_ch,params.CHROMAP_TRIM_ADAPTERS)
+  println ('finished run_chromap_map_to_idx')
+  // TODO: ADD SUBPOOL EXECUTION ON THE OUTPUT
+  
+  
+  // STEP 9: call bgzip run_chromap_map_to_idx.out.chromap_map_bed_path
+  println ('before call bgzip')
+  println (run_chromap_map_to_idx.out.chromap_map_bed_path)
+  run_bgzip(run_chromap_map_to_idx.out.chromap_map_bed_path)
+  println ('after call bgzip')
+  
+  // STEP 10: call TABIX
+  println params.RUN_TABIX_SCRIPT
+  println ('before call run_tabix_fragment_file')
+  run_tabix(params.RUN_TABIX_SCRIPT,run_bgzip.out.bgzip_fragments_out)
+  println ('after call run_tabix_fragment_file')
+  
+  // STEP 11: merge logs
+  // run_chromap_map_to_idx.out.chromap_map_alignment_log - chromap_alignment_log
+  // run_chromap_map_to_idx.out.chromap_map_summary_mapping_statistics - chromap_barcode_log
+  println ('before call run_merge_logs')
+  run_merge_logs(run_chromap_map_to_idx.out.chromap_map_alignment_log,run_chromap_map_to_idx.out.chromap_map_summary_mapping_statistics)
+  println ('after call run_merge_logs')
+  
+  // STEP 12: filter fragments
+  println ('before call run_merge_logs')
+  barcode_conversion_file_ch = channel.value(file(params.BARCODE_CONVERSION_DICT_FILE))
+  
+  println ('before call run_filter_fragments')
+  run_filter_fragments(params.ATAC_BARCODE_AND_POOL,run_tabix.out.tbi_fragments_out,barcode_conversion_file_ch,params.SUBPOOL,run_chromap_map_to_idx.out.chromap_map_summary_mapping_statistics,params.ATAC_FRAGMENTS_CUTOFF)
+  println ('after call run_filter_fragments')
+  
+  // STEP 13: run tabix to the output from the filter
+  println ('before call run_tabix for the second time with filtered_fragment_file_out')
+  println run_filter_fragments.out.filtered_fragment_file_out
+  run_tabix_filtered_fragments(params.RUN_TABIX_SCRIPT,run_filter_fragments.out.filtered_fragment_file_out)
+  
+  // STEP 14: run tss 
+  // STEP 9: merge log file. two inputs from the previous execution: alignment_log & barcode_log
   //println ('calling run_seqspec_test')
   //run_seqspec_test()
   // STEP 3: check spec file and update as needed
-  println ('calling run_seqspec_print')
-  run_seqspec_print(sample_run_ch)
-  println ('finished run_seqspec_print')
+  //*println ('calling run_seqspec_print')
+  //*run_seqspec_print(sample_run_ch)
+  //*println ('finished run_seqspec_print')
   
   // There is a bug with the online on the new version
   //   File "/opt/conda/lib/python3.11/site-packages/seqspec/Region.py", line 242, in to_dict
@@ -39,21 +120,21 @@ workflow {
   //run_seqspec_check(sample_run_ch)
   //println ('finished run_seqspec_check')
 
-  println ('start run_seqspec_modify_atac')
-  run_seqspec_modify_atac(sample_run_ch)
-  println ('finish run_seqspec_modify_atac')
+  //*println ('start run_seqspec_modify_atac')
+  //*run_seqspec_modify_atac(sample_run_ch)
+  //*println ('finish run_seqspec_modify_atac')
 
   //println ('call run_chromap_test')
   //run_chromap_test()
   // STEP  4 - download the genome
-  println ('start genome_fasta_ch download')
-  genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
-  println ('finished genome_fasta_ch download')
+  //*println ('start genome_fasta_ch download')
+  //*genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
+  //*println ('finished genome_fasta_ch download')
 
   // STEP 5 - download the gtf
-  println ('start genome_gtf_ch download')
-  genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
-  println ('finished genome_gtf_ch download')
+  //*println ('start genome_gtf_ch download')
+  //*genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
+  //*println ('finished genome_gtf_ch download')
 
   // STEP 6a: download chromap index
   // println ('start genome_chromap_idx download')
@@ -61,9 +142,9 @@ workflow {
   // println ('finished genome_chromap_idx download')
   
   // Step 6b: create chromap index - make sure that you have enough resources
-  println ('start run_create_chromap_idx')
-  run_create_chromap_idx(genome_fasta_ch)
-  println ('finished run_create_chromap_idx')
+  //*println ('start run_create_chromap_idx')
+  //*run_create_chromap_idx(genome_fasta_ch)
+  //*println ('finished run_create_chromap_idx')
   
   // map the fastq files to the idx and fa file. genome_chromap_idx
   // println ('start run_chromap_map_to_idx')

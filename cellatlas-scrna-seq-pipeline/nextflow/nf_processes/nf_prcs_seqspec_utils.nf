@@ -105,12 +105,12 @@ process run_seqspec_modify_atac {
   debug true
   label 'seqspec_local'
   input:
-    tuple path(fastq1), path(fastq2),path(fastq3), path(spec_yaml), path(whitelist_file)
+    tuple path(fastq1), path(fastq2),path(fastq3), path(spec_yaml),path(whitelist_file)
   output:
     path "nf_seqspec_modify.yaml", emit: seqspec_modify_atac_out
   script:
   """
-  echo start run_seqspec_modify_rna
+  echo start run_seqspec_modify_atac
   echo $fastq1
   echo $fastq2
   echo $fastq3

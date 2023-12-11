@@ -1,3 +1,5 @@
+// RNA workflow
+
 include {run_synpase_download} from './../../nf_processes/nf_prcs_synapse_utils.nf'
 include {run_kb_ref;run_kb_count;run_download_kb_idx} from './../../nf_processes/nf_prcs_kallisto_bustools.nf'
 include {run_downloadFiles} from './../../nf_processes/nf_prcs_download_url_files.nf'
@@ -31,50 +33,50 @@ workflow {
   technology = run_seqspec_index_rna_kb.out.seqspec_technology_out_file
   println ('technology is $technology')
   
-  // STEP 4: download the genome FA
+  // STEP 5: download the genome FA
   genome_fasta_ch = channel.value(file(params.GENOME_FASTA))
   println ('after genome_fasta_ch')
 
-  // STEP 5: download the geonme gtf
+  // STEP 6: download the geonme gtf
   genome_gtf_ch = channel.value(file(params.GENOME_GZ_GTF))
   println ('after genome_gtf_ch')
 
-  // STEP 6a: SIG KILL 9 - probably something with the machine properties
+  // STEP 7a: SIG KILL 9 - probably something with the machine properties
   // on a bigger machine with CPU. workaround - download reference
   run_kb_ref(genome_fasta_ch, genome_gtf_ch)
   println ('after run_kb_ref')
   index_out = run_kb_ref.out.index_out
   t2g_out = run_kb_ref.out.t2g_txt_out
 
-  // STEP 6b-1: get the organism name
+  // STEP 7b-1: get the organism name
   genome_idx_org_ch = channel.value(params.ORGANISM)
   println ('after get organism')
   
-  // STEP 6b-2: download the index of the organims
+  // STEP 7b-2: download the index of the organims
   //run_download_kb_idx(genome_idx_org_ch)
   //println ('after run_download_kb_idx')
   //index_out = run_download_kb_idx.out.index_out
   //t2g_out = run_download_kb_idx.out.t2g_txt_out
   
-  // STEP 7: run alignment run_kb_count input: path index_file,path t2g_txt,path gtf_gz,tuple path(fastq1),path(fastq2),path(fastq3), path(spec_yaml),path technology
+  // STEP 8: run alignment run_kb_count input: path index_file,path t2g_txt,path gtf_gz,tuple path(fastq1),path(fastq2),path(fastq3), path(spec_yaml),path technology
   run_kb_count(index_out,t2g_out,genome_gtf_ch,sample_run_ch,technology)
   println ('after run_kb_count')
   adata = run_kb_count.out.adata_out_h5ad
   
-  // STEP 8: QC - for the test, will get a count H5 from the parameters
+  // STEP 9: QC - for the test, will get a count H5 from the parameters
   // debug start
   //adata_file = file(params.ANNDATA_FILE)
   //println 'params.ANNDATA_FILE is: ' + params.ANNDATA_FILE
   //println 'adata_file is: ' + adata_file
   // debug end 
-  // TODO: change the subpool to be part of the csv input file
+
   subpool = channel.value(params.SUBPOOL)
   sc_rna_qc_script = params.SC_RNA_QC_SCRIPT
   scrna_calculate_qc_metrics(sc_rna_qc_script,adata,subpool)
   scrna_qc_metrics_tsv=scrna_calculate_qc_metrics.out.rna_qc_metrics_tsv
   println 'scrna_qc_metrics_tsv is: '+ scrna_qc_metrics_tsv
   
-  // STEP 9: QC - plot the elbow
+  // STEP 10: QC - plot the elbow
   umi_cutoff = params.UMI_CUTOFF
   gene_cutoff = params.GENE_CUTOFF
   // start debug
