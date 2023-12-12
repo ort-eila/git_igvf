@@ -8,7 +8,7 @@ include {run_bgzip} from './../../nf_processes/nf_prcs_bgzip.nf'
 include {run_tabix;run_tabix_filtered_fragments} from './../../nf_processes/nf_prcs_tabix.nf'
 include {run_merge_logs} from './../../nf_processes/nf_prcs_merge_logs.nf'
 include {run_filter_fragments} from './../../nf_processes/nf_prcs_filter_fragments.nf'
-include {run_tss} from './../../nf_processes/nf_prcs_tss.nf'
+include {run_calculate_tss_enrichment} from './../../nf_processes/nf_prcs_tss.nf'
 
 workflow {
   println params.FASTQS_SPEC_CH
@@ -105,7 +105,10 @@ workflow {
   run_tabix_filtered_fragments(params.RUN_TABIX_SCRIPT,run_filter_fragments.out.filtered_fragment_file_out)
   
   // STEP 14: run tss 
-  println ('before call run_tss')
-  run_tss(run_tabix_filtered_fragments.out.tbi_fragments_out)
-  println ('after call run_tss')
+  println ('before call run_calculate_tss_enrichment')
+ 
+  regions_ch = channel.value(file(params.ATAC_TSS_REGION_BED_FILE)) 
+  println ('after regions_ch')
+  run_calculate_tss_enrichment(params.ATAC_TSS_CALCULATION_SCRIPT,run_filter_fragments.out.filtered_fragment_file_out,run_tabix_filtered_fragments.out.tbi_fragments_out,regions_ch,params.ATAC_TSS_BASES_FLANK,params.ATAC_TSS_COL_WITH_STRANDS_INFO,params.ATAC_TSS_SMOOTHING_WINDOW_SIZE)
+  println ('after call run_calculate_tss_enrichment')
 }
