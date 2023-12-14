@@ -9,6 +9,8 @@ include {run_tabix;run_tabix_filtered_fragments} from './../../nf_processes/nf_p
 include {run_merge_logs} from './../../nf_processes/nf_prcs_merge_logs.nf'
 include {run_filter_fragments} from './../../nf_processes/nf_prcs_filter_fragments.nf'
 include {run_calculate_tss_enrichment} from './../../nf_processes/nf_prcs_tss.nf'
+include {run_scrna_atac_plot_qc_metrics} from './../../nf_processes/nf_prcs_atac_qc_plots.nf'
+include {run_atac_barcode_metadata} from './../../nf_processes/nf_prcs_generate_barcode_metadata.nf'
 
 workflow {
   println params.FASTQS_SPEC_CH
@@ -106,9 +108,23 @@ workflow {
   
   // STEP 14: run tss 
   println ('before call run_calculate_tss_enrichment')
- 
   regions_ch = channel.value(file(params.ATAC_TSS_REGION_BED_FILE)) 
   println ('after regions_ch')
   run_calculate_tss_enrichment(params.ATAC_TSS_CALCULATION_SCRIPT,run_filter_fragments.out.filtered_fragment_file_out,run_tabix_filtered_fragments.out.tbi_fragments_out,regions_ch,params.ATAC_TSS_BASES_FLANK,params.ATAC_TSS_COL_WITH_STRANDS_INFO,params.ATAC_TSS_SMOOTHING_WINDOW_SIZE)
   println ('after call run_calculate_tss_enrichment')
+  
+  
+  // STEP 15: run_scrna_atac_plot_qc_metrics
+  println ('before call run_scrna_atac_plot_qc_metrics')
+  barcode_metadata_file = channel.value(file(params.SC_ATAC_QC_BARCODE_METADATA_FILE))
+  run_scrna_atac_plot_qc_metrics(params.SC_ATAC_QC_PLOT_SCRIPT,params.SC_ATAC_QC_PLOT_HELPER_SCRIPT,barcode_metadata_file,params.SC_ATAC_QC_FRAGMENT_CUTOFF,params.SC_ATAC_QC_BARCODE_OUTPUT_FILE)
+  println ('after call run_scrna_atac_plot_qc_metrics')
+  
+  // STEP 16: Generate barcode metadata
+  println ('before call run_generate_barcode_metadata')
+  filtered_barcode_stats = channel.value(file(params.SC_ATAC_BARCODE_METADATA_FILTERED_BARCODE_STATS))
+  tss_enrichment_barcode_stats = channel.value(file(params.SC_ATAC_BARCODE_METADATA_TSS_ENRICHMENT_BARCODE_STATS))
+  run_atac_barcode_metadata(filtered_barcode_stats,tss_enrichment_barcode_stats,params.SC_ATAC_BARCODE_METADATA_SCRIPT)
+  
+  // STEP 17: Generate barcode rank plot
 }

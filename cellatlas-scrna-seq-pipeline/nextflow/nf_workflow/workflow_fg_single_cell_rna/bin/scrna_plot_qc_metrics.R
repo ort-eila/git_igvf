@@ -1,5 +1,3 @@
-# ... (other functions and code)
-## Import helper functions
 
 # Function to find and source a file in PATH
 source_file_in_path <- function(file_name) {
@@ -235,7 +233,7 @@ umi_rank_plot_file <- commandArgs(trailingOnly = TRUE)[5]
 gene_rank_plot_file <- commandArgs(trailingOnly = TRUE)[6]
 gene_umi_plot_file <- commandArgs(trailingOnly = TRUE)[7]
 
-# Example: Source the helper script if found in PATH
+# Source the helper script if found in PATH
 source_file_in_path(r_qc_plot_helper_script)
 
 # Call the main function with arguments
