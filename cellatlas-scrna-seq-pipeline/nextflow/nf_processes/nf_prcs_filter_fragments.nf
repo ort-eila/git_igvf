@@ -19,12 +19,16 @@ process run_filter_fragments {
   echo 'barcode_conversion_dict_file is $barcode_conversion_dict_file'
   echo 'atac_and_pool_bash_script is $atac_and_pool_bash_script'
   echo 'call to ls usr local bin'
-  ls /usr/local/bin/
+  
+  # Determine the script path
+  script_path=\$(command -v $atac_and_pool_bash_script)
+  echo "Script path: \$script_path"
 
-  /usr/local/bin/$atac_and_pool_bash_script $barcode_conversion_dict_file $subpool_in $barcode_summary $fragments_cutoff $fragments_file $task.cpus filtered_fragment_file.bed
+  \$script_path $barcode_conversion_dict_file $subpool_in $barcode_summary $fragments_cutoff $fragments_file $task.cpus filtered_fragment_file.bed
 
   echo 'TODO:comment out when execute with real data'
   /usr/local/bin/create_sample_filtered_fragment_file.sh
+  
   echo 'ls after the execution of the script'
   ls
   echo 'end run_filter_fragments'

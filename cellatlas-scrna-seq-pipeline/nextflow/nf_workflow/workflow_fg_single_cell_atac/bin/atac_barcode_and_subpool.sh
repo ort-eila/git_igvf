@@ -1,13 +1,13 @@
 #!/bin/bash
 
 echo "------ Script Parameters ------"
-echo "barcode_conversion_dict_file: $1"
-echo "subpool_in: $2"
-echo "barcode_summary: $3"
-echo "fragments_cutoff: $4"
-echo "fragments_file: $5"
-echo "cpus: $6"
-echo "filtered_fragment_file: $7"
+echo "barcode_conversion_dict_file: $0"
+echo "subpool_in: $1"
+echo "barcode_summary: $2"
+echo "fragments_cutoff: $3"
+echo "fragments_file: $4"
+echo "cpus: $5"
+echo "filtered_fragment_file: $6"
 echo "------------------------------"
 
 if [ "$1" == "na.na" ]; then

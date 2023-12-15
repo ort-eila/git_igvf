@@ -1,4 +1,4 @@
-# myscript.R
+# scrna_plot_atac_qc_metrics.R
 #!/usr/bin/Rscript
 
 # Define source_file_in_path function
