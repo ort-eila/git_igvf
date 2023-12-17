@@ -12,11 +12,6 @@ include {run_calculate_tss_enrichment} from './../../nf_processes/nf_prcs_tss.nf
 include {run_scrna_atac_plot_qc_metrics} from './../../nf_processes/nf_prcs_atac_qc_plots.nf'
 include {run_atac_barcode_metadata} from './../../nf_processes/nf_prcs_generate_barcode_metadata.nf'
 include {run_atac_barcode_rank_plot} from './../../nf_processes/nf_prcs_atac_barcode_rank_plot.nf'
-//run_joint_barcode_metadata
-
-
-
-
 
 workflow {
   println params.FASTQS_SPEC_CH
@@ -135,4 +130,6 @@ workflow {
   // STEP 17: Generate barcode rank plot
   println ('before call run_generate_barcode_rank_plot')
   run_atac_barcode_rank_plot(params.SC_ATAC_GENERATE_BARCODE_RANK_PLOT_SCRIPT,run_filter_fragments.out.filtered_fragment_file_out,params.SC_ATAC_GENERATE_BARCODE_RANK_PLOT_PKR)
+  
+ 
 }
